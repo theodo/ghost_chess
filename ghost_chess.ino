@@ -27,6 +27,7 @@
 
 MeStepper stepper_x(PORT_1);
 MeStepper stepper_y(PORT_2);
+Servo servo;
 
 MeLimitSwitch limit_x_min(PORT_3, SLOT_1);
 MeLimitSwitch limit_x_max(PORT_3, SLOT_2);
@@ -39,36 +40,58 @@ void setup()
 {
   Serial.begin(9600);
   // Change these to suit your stepper if you want
-  stepper_x.setMaxSpeed(1000);
+  stepper_x.setMaxSpeed(500);
   stepper_x.setAcceleration(20000);
-  stepper_y.setMaxSpeed(1000);
+  stepper_y.setMaxSpeed(500);
   stepper_y.setAcceleration(20000);
+
+  servo.attach(A1);
 }
 
 void loop()
 {
   if(Serial.available())
   {
-    char a = Serial.read();
-    switch(a)
+    char move[4];
+    Serial.readBytesUntil(10, move, 4);
+    Serial.println(move);
+    Serial.println(move[0]);
+    char firstchar = move[0];
+    switch(firstchar)
     {
       case '0':
       stepper_x.moveTo(0);
       break;
       case '1':
-      stepper_x.moveTo(200);
+      stepper_y.moveTo(0);
       break;
       case '2':
-      stepper_x.move(50);
+      stepper_x.move(250);
       break;
       case '3':
-      stepper_x.move(-50);
+      stepper_x.move(-250);
       break;
       case '4':
-      stepper_y.move(50);
+      stepper_y.move(250);
       break;
       case '5':
-      stepper_y.move(-50);
+      stepper_y.move(-250);
+      break;
+      case '6':
+      stepper_y.move(-250);
+      stepper_x.move(-500);
+      break;
+      case '7':
+      stepper_y.move(250);
+      stepper_x.move(500);
+      break;
+      case '8':
+      servo.write(0);
+      delay(15);
+      break;
+      case '9':
+      servo.write(80);
+      delay(15);
       break;
     }
   }
